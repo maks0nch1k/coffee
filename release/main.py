@@ -1,20 +1,19 @@
 import sys
 import sqlite3
-from PyQt5 import uic
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QTableWidget
+from main_window import Ui_MainWindow as main_window
+from release.addEditCoffeeForm import Ui_MainWindow as addEditCoffeeForm
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
 
 
-class AddCoffee(QMainWindow):
+class AddCoffee(QMainWindow, addEditCoffeeForm):
     def __init__(self):
         super().__init__()
-        uic.loadUi("addEditCoffeeForm.ui", self)
+        self.setupUi(self)
         self.setWindowTitle("Добавить")
         self.pushButton.clicked.connect(self.add)
 
     def add(self):
-        con = sqlite3.connect("coffee.db")
+        con = sqlite3.connect("../data/coffee.db")
         cur = con.cursor()
 
         name = self.lineEdit.text()
@@ -32,16 +31,16 @@ class AddCoffee(QMainWindow):
         self.close()
 
 
-class EditCoffee(QMainWindow):
+class EditCoffee(QMainWindow, addEditCoffeeForm):
     def __init__(self):
         super().__init__()
-        uic.loadUi("addEditCoffeeForm.ui", self)
+        self.setupUi(self)
         self.setWindowTitle("Изменить")
         self.current_elem = ""
         self.pushButton.clicked.connect(self.edit)
 
     def initUI(self):
-        con = sqlite3.connect("coffee.db")
+        con = sqlite3.connect("../data/coffee.db")
         cur = con.cursor()
         data = cur.execute(f"""SELECT * FROM coffee WHERE name = '{self.current_elem}'""").fetchone()
         con.close()
@@ -53,7 +52,7 @@ class EditCoffee(QMainWindow):
         self.spinBox_2.setValue(data[6])
 
     def edit(self):
-        con = sqlite3.connect("coffee.db")
+        con = sqlite3.connect("../data/coffee.db")
         cur = con.cursor()
 
         name = self.lineEdit.text()
@@ -73,10 +72,10 @@ class EditCoffee(QMainWindow):
         self.close()
 
 
-class MyWidget(QMainWindow):
+class MyWidget(QMainWindow, main_window):
     def __init__(self):
         super().__init__()
-        uic.loadUi("main.ui", self)
+        self.setupUi(self)
         self.setWindowTitle("Эспрессо")
         self.loadTable()
         self.pushButton.clicked.connect(self.add)
@@ -96,7 +95,7 @@ class MyWidget(QMainWindow):
         self.edit.show()
 
     def loadTable(self):
-        con = sqlite3.connect("coffee.db")
+        con = sqlite3.connect("../data/coffee.db")
         cur = con.cursor()
         reader = cur.execute("""SELECT * FROM coffee""").fetchall()
         con.close()
